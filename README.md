@@ -179,29 +179,4 @@ Product images are stored in `static/picture/` directory and served via `/pictur
 - Configure reverse proxy (Nginx)
 - Enable HTTPS
 
-## 📋 Project Documentation
-
-This project includes comprehensive documentation:
-
-- **PROJECT_INITIATION_DOCUMENT.md**: Business values and system scope
-- **DESIGN_SPECIFICATION.md**: E-R diagram and database design
-- **CONFIGURATION_SPECIFICATION.md**: SQL statements and configurations
-- **PROJECT_CONCLUSION.md**: Project assessment and recommendations
-
-## 🤝 Contributing
-
-Welcome to submit Issues and Pull Requests to improve this project!
-
-## 📄 License
-
-This project is licensed under the MIT License.
-
-## 📞 Support
-
-For questions, please contact through:
-- Submit GitHub Issues
-- Email the project maintainer
-
----
-
 **Enjoy your coffee time!** ☕✨
