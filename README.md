@@ -9,7 +9,6 @@ A comprehensive coffee shop ordering system with modern user interface, database
 - **Shopping Cart Management**: Add, modify, and remove items
 - **Online Ordering**: Complete order processing workflow
 - **Order History**: View past orders and details
-- **Responsive Design**: Support for mobile and desktop devices
 - **Member System**: User registration and login functionality
 
 ### Admin Dashboard
