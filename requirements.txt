@@ -1,0 +1,18 @@
+# Consolidated project dependencies (app + reporting)
+
+# Web app
+Flask==2.3.3
+Flask-CORS==4.0.0
+
+# Data processing
+pandas>=1.5.0
+numpy>=1.21.0
+
+# Visualization
+matplotlib>=3.5.0
+seaborn>=0.11.0
+
+# Config
+pyyaml>=6.0
+
+# Note: sqlite3, datetime, hashlib are standard library modules and should not be installed via pip.

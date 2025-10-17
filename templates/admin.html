@@ -1,0 +1,708 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Coffee Ordering System</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+        .report-card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            border-left: 4px solid #667eea;
+        }
+        
+        .report-card h3 {
+            color: #4a5568;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .stat-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .stat-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+        
+        .stat-card h4 {
+            font-size: 0.9em;
+            margin-bottom: 10px;
+            opacity: 0.9;
+        }
+        
+        .stat-card .stat-value {
+            font-size: 2em;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        
+        .chart-container {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .date-filter {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .date-filter input {
+            padding: 8px 12px;
+            border: 2px solid #e2e8f0;
+            border-radius: 6px;
+            font-size: 0.9em;
+        }
+        
+        .export-btn {
+            background: #48bb78;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        
+        .export-btn:hover {
+            background: #38a169;
+            transform: translateY(-2px);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <h1>📊 Admin Dashboard</h1>
+            <p>Analytics and reports for the coffee shop</p>
+            <div style="margin-top: 15px;">
+                <a href="/" class="btn btn-secondary">Back to Home</a>
+                <a href="/admin/logout" class="btn btn-secondary" style="margin-left: 10px;">Logout</a>
+            </div>
+        </header>
+
+        <!-- Tabs -->
+        <div class="nav-tabs">
+            <button class="nav-tab active" data-tab="dashboard">Dashboard</button>
+            <button class="nav-tab" data-tab="sales">Sales</button>
+            <button class="nav-tab" data-tab="products">Products</button>
+            <button class="nav-tab" data-tab="customers">Customers</button>
+            <button class="nav-tab" data-tab="orders">Orders</button>
+        </div>
+
+        <!-- 内容区域 -->
+        <div class="content">
+            <!-- Dashboard -->
+            <div id="dashboardTab" class="tab-content active">
+                <h2 style="color: #4a5568; margin-bottom: 20px;">Overview</h2>
+                
+                <div class="stat-grid" id="statsGrid">
+                    <div class="stat-card">
+                        <h4>Sales Today</h4>
+                        <div class="stat-value" id="todaySales">$0</div>
+                        <small>vs. yesterday</small>
+                    </div>
+                    <div class="stat-card">
+                        <h4>Orders Today</h4>
+                        <div class="stat-value" id="todayOrders">0</div>
+                        <small>orders</small>
+                    </div>
+                    <div class="stat-card">
+                        <h4>Avg. Order Value</h4>
+                        <div class="stat-value" id="avgOrderValue">$0</div>
+                        <small>per order</small>
+                    </div>
+                    <div class="stat-card">
+                        <h4>Total Customers</h4>
+                        <div class="stat-value" id="totalCustomers">0</div>
+                        <small>registered</small>
+                    </div>
+                </div>
+
+                <div class="report-card">
+                    <h3>📈 Sales Trend (Last 7 Days)</h3>
+                    <div id="salesTrendChart" style="height: 300px; display: flex; align-items: center; justify-content: center; color: #718096;">
+                        Chart placeholder
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sales -->
+            <div id="salesTab" class="tab-content">
+                <h2 style="color: #4a5568; margin-bottom: 20px;">Sales Report</h2>
+                
+                <div class="date-filter">
+                    <label>Start:</label>
+                    <input type="date" id="startDate">
+                    <label>End:</label>
+                    <input type="date" id="endDate">
+                    <button class="btn btn-primary" onclick="loadSalesReport()">Query</button>
+                    <button class="export-btn" onclick="exportSalesReport()">Export</button>
+                </div>
+
+                <div class="report-card">
+                    <h3>📊 Sales Data</h3>
+                    <div id="salesReportContainer">
+                        <div style="text-align: center; padding: 40px;">
+                            <div class="loading"></div>
+                            <p style="margin-top: 10px; color: #718096;">Loading sales report...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Products -->
+            <div id="productsTab" class="tab-content">
+                <h2 style="color: #4a5568; margin-bottom: 20px;">Product Sales Analysis</h2>
+                
+                <div class="report-card">
+                    <h3>🏆 Top Selling Products</h3>
+                    <div id="productReportContainer">
+                        <div style="text-align: center; padding: 40px;">
+                            <div class="loading"></div>
+                            <p style="margin-top: 10px; color: #718096;">Loading product analysis...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Customers -->
+            <div id="customersTab" class="tab-content">
+                <h2 style="color: #4a5568; margin-bottom: 20px;">Customer Analysis</h2>
+                
+                <div class="report-card">
+                    <h3>👥 Top Customers</h3>
+                    <div id="customerReportContainer">
+                        <div style="text-align: center; padding: 40px;">
+                            <div class="loading"></div>
+                            <p style="margin-top: 10px; color: #718096;">Loading customer analysis...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Orders -->
+            <div id="ordersTab" class="tab-content">
+                <h2 style="color: #4a5568; margin-bottom: 20px;">Orders</h2>
+                
+                <div class="report-card">
+                    <h3>📋 All Orders</h3>
+                    <div id="allOrdersContainer">
+                        <div style="text-align: center; padding: 40px;">
+                            <div class="loading"></div>
+                            <p style="margin-top: 10px; color: #718096;">Loading orders...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    <script>
+        // Admin specific JavaScript
+        let currentAdminTab = 'dashboard';
+
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeAdmin();
+        });
+
+        function initializeAdmin() {
+            setupAdminEventListeners();
+            loadDashboard();
+        }
+
+        function setupAdminEventListeners() {
+            // Tab click events
+            document.querySelectorAll('.nav-tab').forEach(tab => {
+                tab.addEventListener('click', (e) => {
+                    const tabName = e.target.dataset.tab;
+                    if (tabName) {
+                        showAdminTab(tabName);
+                    }
+                });
+            });
+
+            // Default date range
+            const today = new Date();
+            const lastWeek = new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000);
+            
+            document.getElementById('endDate').value = today.toISOString().split('T')[0];
+            document.getElementById('startDate').value = lastWeek.toISOString().split('T')[0];
+        }
+
+        function showAdminTab(tabName) {
+            document.querySelectorAll('.nav-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            document.querySelector(`[data-tab="${tabName}"]`).classList.add('active');
+
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            document.getElementById(`${tabName}Tab`).classList.add('active');
+
+            currentAdminTab = tabName;
+
+            // Load data by tab
+            switch(tabName) {
+                case 'dashboard':
+                    loadDashboard();
+                    break;
+                case 'sales':
+                    loadSalesReport();
+                    break;
+                case 'products':
+                    loadProductReport();
+                    break;
+                case 'customers':
+                    loadCustomerReport();
+                    break;
+                case 'orders':
+                    loadAllOrders();
+                    break;
+            }
+        }
+
+        async function loadDashboard() {
+            try {
+                // Load stats
+                const [salesResponse, ordersResponse, customersResponse] = await Promise.all([
+                    fetch('/api/reports/sales'),
+                    fetch('/api/orders'),
+                    fetch('/api/reports/customers')
+                ]);
+
+                const salesData = await salesResponse.json();
+                const ordersData = await ordersResponse.json();
+                const customersData = await customersResponse.json();
+
+                updateDashboardStats(salesData.data, ordersData.data, customersData.data);
+            } catch (error) {
+                console.error('Load dashboard failed:', error);
+                showAlert('Failed to load dashboard data', 'error');
+            }
+        }
+
+        function updateDashboardStats(salesData, ordersData, customersData) {
+            // Compute today data
+            const today = new Date().toISOString().split('T')[0];
+            const todayData = salesData.find(item => item.date === today) || { total_sales: 0, order_count: 0, avg_order_value: 0 };
+
+            document.getElementById('todaySales').textContent = `$${todayData.total_sales.toFixed(2)}`;
+            document.getElementById('todayOrders').textContent = todayData.order_count;
+            document.getElementById('avgOrderValue').textContent = `$${todayData.avg_order_value.toFixed(2)}`;
+            document.getElementById('totalCustomers').textContent = customersData.length;
+        }
+
+        async function loadSalesReport() {
+            try {
+                const startDate = document.getElementById('startDate').value;
+                const endDate = document.getElementById('endDate').value;
+                
+                const response = await fetch(`/api/reports/sales?start_date=${startDate}&end_date=${endDate}`);
+                const result = await response.json();
+
+                if (result.success) {
+                    renderSalesReport(result.data);
+                } else {
+                    throw new Error(result.error);
+                }
+            } catch (error) {
+                console.error('Load sales report failed:', error);
+                showAlert('Failed to load sales report', 'error');
+            }
+        }
+
+        function renderSalesReport(data) {
+            const container = document.getElementById('salesReportContainer');
+            
+            if (data.length === 0) {
+                container.innerHTML = '<p style="text-align: center; color: #718096;">No sales in selected range</p>';
+                return;
+            }
+
+            let totalSales = 0;
+            let totalOrders = 0;
+
+            const table = document.createElement('table');
+            table.className = 'table';
+            table.innerHTML = `
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Orders</th>
+                        <th>Total Sales</th>
+                        <th>Avg Order Value</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${data.map(item => {
+                        totalSales += item.total_sales;
+                        totalOrders += item.order_count;
+                        return `
+                            <tr>
+                                <td>${item.date}</td>
+                                <td>${item.order_count}</td>
+                                <td>$${item.total_sales.toFixed(2)}</td>
+                                <td>$${item.avg_order_value.toFixed(2)}</td>
+                            </tr>
+                        `;
+                    }).join('')}
+                </tbody>
+                <tfoot>
+                    <tr style="background: #f7fafc; font-weight: bold;">
+                        <td>Total</td>
+                        <td>${totalOrders}</td>
+                        <td>$${totalSales.toFixed(2)}</td>
+                        <td>$${totalOrders > 0 ? (totalSales / totalOrders).toFixed(2) : '0.00'}</td>
+                    </tr>
+                </tfoot>
+            `;
+
+            container.innerHTML = '';
+            container.appendChild(table);
+        }
+
+        async function loadProductReport() {
+            try {
+                const response = await fetch('/api/reports/products');
+                const result = await response.json();
+
+                if (result.success) {
+                    renderProductReport(result.data);
+                } else {
+                    throw new Error(result.error);
+                }
+            } catch (error) {
+                console.error('Load product report failed:', error);
+                showAlert('Failed to load product report', 'error');
+            }
+        }
+
+        function renderProductReport(data) {
+            const container = document.getElementById('productReportContainer');
+            
+            if (data.length === 0) {
+                container.innerHTML = '<p style="text-align: center; color: #718096;">No product sales data</p>';
+                return;
+            }
+
+            const table = document.createElement('table');
+            table.className = 'table';
+            table.innerHTML = `
+                <thead>
+                    <tr>
+                        <th>Product</th>
+                        <th>Category</th>
+                        <th>Quantity</th>
+                        <th>Revenue</th>
+                        <th>Orders</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${data.map((item, index) => `
+                        <tr>
+                            <td>
+                                <span style="color: #667eea; font-weight: bold;">#${index + 1}</span>
+                                ${item.product_name}
+                            </td>
+                            <td>${item.category}</td>
+                            <td>${item.total_quantity}</td>
+                            <td>$${item.total_revenue.toFixed(2)}</td>
+                            <td>${item.order_count}</td>
+                        </tr>
+                    `).join('')}
+                </tbody>
+            `;
+
+            container.innerHTML = '';
+            container.appendChild(table);
+        }
+
+        async function loadCustomerReport() {
+            try {
+                const response = await fetch('/api/reports/customers');
+                const result = await response.json();
+
+                if (result.success) {
+                    renderCustomerReport(result.data);
+                } else {
+                    throw new Error(result.error);
+                }
+            } catch (error) {
+                console.error('Load customer report failed:', error);
+                showAlert('Failed to load customer report', 'error');
+            }
+        }
+
+        function renderCustomerReport(data) {
+            const container = document.getElementById('customerReportContainer');
+            
+            if (data.length === 0) {
+                container.innerHTML = '<p style="text-align: center; color: #718096;">No customer data</p>';
+                return;
+            }
+
+            const table = document.createElement('table');
+            table.className = 'table';
+            table.innerHTML = `
+                <thead>
+                    <tr>
+                        <th>Customer</th>
+                        <th>Type</th>
+                        <th>Orders</th>
+                        <th>Total Spent</th>
+                        <th>Avg Order Value</th>
+                        <th>Last Order</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${data.map((item, index) => `
+                        <tr>
+                            <td>
+                                <span style="color: #667eea; font-weight: bold;">#${index + 1}</span>
+                                ${item.customer_name}
+                            </td>
+                            <td>
+                                <span class="badge ${item.customer_type === 'member' ? 'badge-gold' : 'badge-silver'}">${item.customer_type === 'member' ? 'Member' : 'Regular'}</span>
+                            </td>
+                            <td>${item.order_count}</td>
+                            <td>$${item.total_spent.toFixed(2)}</td>
+                            <td>$${item.avg_order_value.toFixed(2)}</td>
+                            <td>${item.last_order_date ? new Date(item.last_order_date).toLocaleDateString('en-US') : 'N/A'}</td>
+                            <td>
+                                ${item.customer_type === 'member' ? 
+                                    `<button class="btn btn-primary" style="padding: 5px 10px; font-size: 0.8em;" onclick="viewMemberDetails(${item.customer_id})">View Details</button>` : 
+                                    '<span style="color: #718096;">-</span>'
+                                }
+                            </td>
+                        </tr>
+                    `).join('')}
+                </tbody>
+            `;
+
+            container.innerHTML = '';
+            container.appendChild(table);
+        }
+
+        async function loadAllOrders() {
+            try {
+                const response = await fetch('/api/orders');
+                const result = await response.json();
+
+                if (result.success) {
+                    renderAllOrders(result.data);
+                } else {
+                    throw new Error(result.error);
+                }
+            } catch (error) {
+                console.error('Load orders failed:', error);
+                showAlert('Failed to load orders', 'error');
+            }
+        }
+
+        function renderAllOrders(orders) {
+            const container = document.getElementById('allOrdersContainer');
+            
+            if (orders.length === 0) {
+                container.innerHTML = '<p style="text-align: center; color: #718096;">No orders</p>';
+                return;
+            }
+
+            const table = document.createElement('table');
+            table.className = 'table';
+            table.innerHTML = `
+                <thead>
+                    <tr>
+                        <th>Order ID</th>
+                        <th>Customer</th>
+                        <th>Date</th>
+                        <th>Payment</th>
+                        <th>Total</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${orders.map(order => `
+                        <tr>
+                            <td>#${order.order_id}</td>
+                            <td>${order.customer_name}</td>
+                            <td>${new Date(order.order_date).toLocaleString('en-US')}</td>
+                            <td>${getPaymentMethodText(order.payment_method)}</td>
+                            <td>$${order.total_amount.toFixed(2)}</td>
+                            <td>
+                                <button class="btn btn-secondary" style="padding: 5px 10px; font-size: 0.8em;" onclick="viewOrderDetails(${order.order_id})">Details</button>
+                            </td>
+                        </tr>
+                    `).join('')}
+                </tbody>
+            `;
+
+            container.innerHTML = '';
+            container.appendChild(table);
+        }
+
+        function exportSalesReport() {
+            const startDate = document.getElementById('startDate').value;
+            const endDate = document.getElementById('endDate').value;
+            
+            // TODO: implement CSV export
+            showAlert('Export is under development...', 'info');
+        }
+
+        async function viewMemberDetails(customerId) {
+            try {
+                // 直接使用客户ID获取会员详细信息
+                const memberResponse = await fetch(`/api/admin/member/${customerId}`);
+                const memberResult = await memberResponse.json();
+                
+                if (memberResult.success) {
+                    showMemberDetailsModal(memberResult.data);
+                } else {
+                    throw new Error(memberResult.error);
+                }
+            } catch (error) {
+                console.error('Failed to load member details:', error);
+                showAlert('Failed to load member details', 'error');
+            }
+        }
+
+        function showMemberDetailsModal(memberData) {
+            const modal = document.createElement('div');
+            modal.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0, 0, 0, 0.5);
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                z-index: 1000;
+            `;
+
+            const content = document.createElement('div');
+            content.style.cssText = `
+                background: white;
+                padding: 30px;
+                border-radius: 15px;
+                max-width: 700px;
+                width: 90%;
+                max-height: 80%;
+                overflow-y: auto;
+            `;
+
+            content.innerHTML = `
+                <h2 style="margin-bottom: 20px; color: #4a5568;">👑 Member Details: ${memberData.name}</h2>
+                
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 30px;">
+                    <div>
+                        <h3 style="color: #2d3748; margin-bottom: 15px;">Basic Information</h3>
+                        <div style="background: #f7fafc; padding: 15px; border-radius: 8px;">
+                            <p><strong>Customer ID:</strong> ${memberData.customer_id}</p>
+                            <p><strong>Name:</strong> ${memberData.name}</p>
+                            <p><strong>Email:</strong> ${memberData.email || 'N/A'}</p>
+                            <p><strong>Phone:</strong> ${memberData.phone || 'N/A'}</p>
+                            <p><strong>Address:</strong> ${memberData.address || 'N/A'}</p>
+                            <p><strong>Date of Birth:</strong> ${memberData.date_of_birth || 'N/A'}</p>
+                            <p><strong>Registration Date:</strong> ${memberData.registration_date ? new Date(memberData.registration_date).toLocaleDateString() : 'N/A'}</p>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <h3 style="color: #2d3748; margin-bottom: 15px;">Order Statistics</h3>
+                        <div style="background: #f7fafc; padding: 15px; border-radius: 8px;">
+                            <p><strong>Total Orders:</strong> ${memberData.order_stats.total_orders}</p>
+                            <p><strong>Total Spent:</strong> $${memberData.order_stats.total_spent.toFixed(2)}</p>
+                            <p><strong>Last Order:</strong> ${memberData.order_stats.last_order_date ? new Date(memberData.order_stats.last_order_date).toLocaleDateString() : 'N/A'}</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div style="margin-bottom: 30px;">
+                    <h3 style="color: #2d3748; margin-bottom: 15px;">Coffee Preferences</h3>
+                    <div style="background: #f7fafc; padding: 15px; border-radius: 8px;">
+                        ${memberData.preferences.length > 0 ? `
+                            ${memberData.preferences.map(pref => `
+                                <p><strong>${pref.type.replace('_', ' ').replace(/\\b\\w/g, l => l.toUpperCase())}:</strong> ${pref.value}</p>
+                            `).join('')}
+                        ` : '<p style="color: #718096;">No preferences set</p>'}
+                    </div>
+                </div>
+                
+                <div style="margin-bottom: 30px;">
+                    <h3 style="color: #2d3748; margin-bottom: 15px;">Favorite Products</h3>
+                    <div style="background: #f7fafc; padding: 15px; border-radius: 8px;">
+                        ${memberData.favorites.length > 0 ? `
+                            ${memberData.favorites.map(fav => `
+                                <p><strong>${fav.name}:</strong> Ordered ${fav.order_count} times • Total: ${fav.total_quantity} items • $${fav.price.toFixed(2)} each</p>
+                            `).join('')}
+                        ` : '<p style="color: #718096;">No favorite products yet</p>'}
+                    </div>
+                </div>
+                
+                <div style="text-align: center; margin-top: 20px;">
+                    <button class="btn btn-secondary" onclick="this.closest('.modal').remove()">Close</button>
+                </div>
+            `;
+
+            modal.className = 'modal';
+            modal.appendChild(content);
+            document.body.appendChild(modal);
+
+            // 点击背景关闭模态框
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) {
+                    modal.remove();
+                }
+            });
+        }
+    </script>
+
+    <style>
+        .badge {
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.8em;
+            font-weight: 500;
+        }
+        
+        .badge-gold {
+            background: linear-gradient(45deg, #f6ad55, #ed8936);
+            color: white;
+        }
+        
+        .badge-silver {
+            background: #e2e8f0;
+            color: #4a5568;
+        }
+        
+        
+    </style>
+</body>
+</html>

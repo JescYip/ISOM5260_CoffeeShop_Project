@@ -1,0 +1,5 @@
+PAYMENT_METHOD,order_count,total_revenue,avg_order_value
+alipay,13,1866,143.53846153846155
+wechat,12,1770,147.5
+cash,11,1242,112.9090909090909
+card,7,655,93.57142857142857

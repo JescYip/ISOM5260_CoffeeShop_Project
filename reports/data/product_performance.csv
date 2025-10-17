@@ -1,0 +1,11 @@
+product_name,CATEGORY_NAME,total_quantity,total_revenue,order_count,avg_quantity_per_order
+Mocha,Coffee,23,805,10,2.3
+Caesar Salad,Light Meal,25,800,12,2.0833333333333335
+Tiramisu,Dessert,18,756,11,1.6363636363636365
+Americano,Coffee,26,650,13,2.0
+Cappuccino,Coffee,17,510,7,2.4285714285714284
+chinesetea,Tea,16,448,9,1.7777777777777777
+Ham Sandwich,Light Meal,15,420,9,1.6666666666666667
+Cheesecake,Dessert,11,418,6,1.8333333333333333
+Milk Tea,Tea,17,374,10,1.7
+Latte,Coffee,11,352,9,1.2222222222222223

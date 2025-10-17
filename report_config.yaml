@@ -1,0 +1,73 @@
+# Coffee Shop Report Generator Configuration
+# =========================================
+
+# Database settings
+database:
+  path: "coffee_shop.db"
+  connection_timeout: 30
+
+# Output settings
+output:
+  directory: "reports"
+  chart_format: "png"
+  chart_dpi: 300
+  csv_encoding: "utf-8"
+  
+# Report settings
+reports:
+  sales_trends:
+    enabled: true
+    days_back: 30
+    include_forecast: false
+    
+  product_performance:
+    enabled: true
+    top_n_products: 10
+    include_inactive: false
+    
+  customer_analysis:
+    enabled: true
+    include_member_preferences: true
+    customer_segments: ["regular", "member"]
+    
+  payment_methods:
+    enabled: true
+    include_percentages: true
+    
+  executive_summary:
+    enabled: true
+    include_comparisons: true
+
+# Chart styling
+styling:
+  theme: "seaborn-v0_8"
+  color_palette: "husl"
+  figure_size:
+    width: 12
+    height: 8
+  font:
+    family: "DejaVu Sans"
+    size: 12
+    weight: "normal"
+
+# LaTeX settings
+latex:
+  document_class: "article"
+  packages:
+    - "geometry"
+    - "graphicx"
+    - "booktabs"
+    - "longtable"
+    - "hyperref"
+    - "datetime"
+  margins: "1in"
+  include_toc: true
+  include_date: true
+
+# Email settings (optional)
+email:
+  enabled: false
+  smtp_server: "smtp.gmail.com"
+  smtp_port: 587
+  recipients: []
+  subject: "Coffee Shop Analytics Report"

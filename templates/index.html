@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Coffee Ordering System</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <h1>☕ Coffee Ordering System</h1>
+            <p>Welcome to our coffee shop. Enjoy the best coffee experience.</p>
+        </header>
+
+        <!-- Navigation Tabs -->
+        <div class="nav-tabs">
+            <button class="nav-tab active" data-tab="menu">Menu</button>
+            <button class="nav-tab" data-tab="cart">Cart</button>
+            <button class="nav-tab" data-tab="order">Checkout</button>
+            
+            <button class="nav-tab" data-tab="account">Account</button>
+            <a href="/admin" class="nav-tab" style="text-decoration: none; display: flex; align-items: center;">Admin</a>
+        </div>
+
+        <!-- Content -->
+        <div class="content">
+            <!-- Menu Tab -->
+            <div id="menuTab" class="tab-content active">
+                <h2 style="color: #4a5568; margin-bottom: 20px;">Our Menu</h2>
+                <div id="productsContainer">
+                    <div style="text-align: center; padding: 40px;">
+                        <div class="loading"></div>
+                        <p style="margin-top: 10px; color: #718096;">Loading menu...</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Cart Tab -->
+            <div id="cartTab" class="tab-content">
+                <h2 style="color: #4a5568; margin-bottom: 20px;">Shopping Cart</h2>
+                <div class="cart">
+                    <div id="cartItems">
+                        <p style="text-align: center; color: #718096;">Your cart is empty</p>
+                    </div>
+                    <div class="cart-total" id="cartTotal">Total: $0.00</div>
+                    <div style="text-align: center; margin-top: 20px;">
+                        <button class="btn btn-danger" onclick="clearCart()">Clear Cart</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Checkout Tab -->
+            <div id="orderTab" class="tab-content">
+                <h2 style="color: #4a5568; margin-bottom: 20px;">Order Information</h2>
+                
+                <!-- Cart Summary -->
+                <div class="cart" style="margin-bottom: 30px;">
+                    <h3 style="color: #4a5568; margin-bottom: 15px;">Order Summary</h3>
+                    <div id="orderSummary">
+                        <p style="text-align: center; color: #718096;">Your cart is empty. Please add items.</p>
+                    </div>
+                    <div class="cart-total" id="orderTotal">Total: $0.00</div>
+                </div>
+
+                <!-- Customer Info Form -->
+                <form id="orderForm">
+                    <h3 style="color: #4a5568; margin-bottom: 20px;">Customer Information</h3>
+                    
+                    <div class="form-group">
+                        <label for="customer_name">Name *</label>
+                        <input type="text" id="customer_name" name="customer_name" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="customer_phone">Phone</label>
+                        <input type="tel" id="customer_phone" name="customer_phone">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="customer_email">Email</label>
+                        <input type="email" id="customer_email" name="customer_email">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="customer_address">Address</label>
+                        <textarea id="customer_address" name="customer_address" rows="3"></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="payment_method">Payment Method *</label>
+                        <select id="payment_method" name="payment_method" required>
+                            <option value="">Please select</option>
+                            <option value="cash">Cash</option>
+                            <option value="card">Card</option>
+                            <option value="alipay">Alipay</option>
+                            <option value="wechat">WeChat Pay</option>
+                        </select>
+                    </div>
+
+                    <div style="text-align: center; margin-top: 30px;">
+                        <button type="submit" class="btn btn-primary" style="padding: 15px 40px; font-size: 1.1em;">
+                            Place Order
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            
+
+            <!-- Account Tab: Login / Register -->
+            <div id="accountTab" class="tab-content">
+                <h2 style="color: #4a5568; margin-bottom: 20px;">Account</h2>
+                <div class="account-grid">
+                    <div class="account-card">
+                        <h3 style="margin-bottom: 15px; color: #4a5568;">Sign In</h3>
+                        <form id="loginForm">
+                            <div class="form-group">
+                                <label for="login_email">Email *</label>
+                                <input type="email" id="login_email" name="email" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="login_password">Password *</label>
+                                <input type="password" id="login_password" name="password" required>
+                            </div>
+                            <button type="submit" class="btn btn-primary" style="width: 100%;">Sign In</button>
+                        </form>
+                    </div>
+                    <div class="account-card">
+                        <h3 style="margin-bottom: 15px; color: #4a5568;">Register</h3>
+                        <form id="registerForm">
+                            <div class="form-group">
+                                <label for="reg_name">Name *</label>
+                                <input type="text" id="reg_name" name="name" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="reg_email">Email *</label>
+                                <input type="email" id="reg_email" name="email" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="reg_password">Password *</label>
+                                <input type="password" id="reg_password" name="password" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="reg_phone">Phone</label>
+                                <input type="tel" id="reg_phone" name="phone">
+                            </div>
+                            <div class="form-group">
+                                <label for="reg_address">Address</label>
+                                <input type="text" id="reg_address" name="address">
+                            </div>
+                            <div class="form-group">
+                                <label for="reg_dob">Date of Birth</label>
+                                <input type="date" id="reg_dob" name="date_of_birth">
+                            </div>
+                            <button type="submit" class="btn btn-primary" style="width: 100%;">Create Account</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    <script>
+        function updateOrderSummary() {
+            const summaryContainer = document.getElementById('orderSummary');
+            const orderTotal = document.getElementById('orderTotal');
+            
+            if (!summaryContainer || !orderTotal) return;
+
+            if (cart.length === 0) {
+                summaryContainer.innerHTML = '<p style="text-align: center; color: #718096;">Your cart is empty. Please add items.</p>';
+                orderTotal.textContent = 'Total: $0.00';
+                return;
+            }
+
+            let total = 0;
+            summaryContainer.innerHTML = '';
+
+            cart.forEach(item => {
+                const itemTotal = item.price * item.quantity;
+                total += itemTotal;
+
+                const summaryItem = document.createElement('div');
+                summaryItem.className = 'cart-item';
+                summaryItem.innerHTML = `
+                    <div>
+                        <strong>${item.name}</strong><br>
+                        <small>$${item.price.toFixed(2)} x ${item.quantity}</small>
+                    </div>
+                    <div>$${itemTotal.toFixed(2)}</div>
+                `;
+                summaryContainer.appendChild(summaryItem);
+            });
+
+            orderTotal.textContent = `Total: $${total.toFixed(2)}`;
+        }
+
+        const originalUpdateCartDisplay = updateCartDisplay;
+        updateCartDisplay = function() {
+            originalUpdateCartDisplay();
+            updateOrderSummary();
+        };
+
+        const originalShowTab = showTab;
+        showTab = function(tabName) {
+            originalShowTab(tabName);
+            if (tabName === 'order') {
+                updateOrderSummary();
+            }
+        };
+    </script>
+</body>
+</html>
