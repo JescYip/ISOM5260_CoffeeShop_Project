@@ -37,7 +37,7 @@ A comprehensive coffee shop ordering system with modern user interface, database
 
 1. **Clone the project**
    ```bash
-   git clone <repository-url>
+   git clone <https://github.com/JescYip/ISOM5260_CoffeeShop_Project.git>
    cd coffee-ordering-system
    ```
 
